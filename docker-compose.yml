@@ -1,0 +1,90 @@
+x-node: &node
+  build: .
+  image: andx-pipeline:latest
+  restart: on-failure
+  mem_limit: 1536m
+  environment: &nodeenv
+    DATABASE_URL: postgres://andx:andx@postgres:5432/andx
+    REDIS_URL: redis://broker:6379
+    NODE_OPTIONS: --max-old-space-size=1200
+  depends_on:
+    postgres: { condition: service_healthy }
+    broker: { condition: service_healthy }
+
+services:
+  broker:
+    image: redis:7-alpine
+    # AOF with fsync on every write: a 202 from gateway means the batch is on disk.
+    command: >
+      redis-server --appendonly yes --appendfsync always
+      --maxmemory 1800mb --maxmemory-policy noeviction
+      --auto-aof-rewrite-percentage 100 --auto-aof-rewrite-min-size 256mb
+    mem_limit: 2g
+    volumes: [broker-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: andx
+      POSTGRES_PASSWORD: andx
+      POSTGRES_DB: andx
+    command: >
+      postgres -c shared_buffers=1GB -c effective_cache_size=3GB -c work_mem=32MB
+      -c maintenance_work_mem=256MB -c max_wal_size=8GB -c checkpoint_timeout=15min
+      -c wal_buffers=64MB -c wal_compression=on -c max_connections=100
+      -c random_page_cost=1.1 -c autovacuum_vacuum_scale_factor=0.05
+    shm_size: 1g
+    mem_limit: 4g
+    volumes: [pg-data:/var/lib/postgresql/data]
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U andx -d andx"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  gateway:
+    <<: *node
+    command: ["node", "services/gateway/src/main.ts"]
+    ports: ["8080:8080"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/healthz || exit 1"]
+      interval: 3s
+      timeout: 2s
+      retries: 40
+
+  api:
+    <<: *node
+    command: ["node", "services/api/src/main.ts"]
+    ports: ["8081:8081"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/healthz || exit 1"]
+      interval: 3s
+      timeout: 2s
+      retries: 40
+
+  aggregator:
+    <<: *node
+    command: ["node", "services/aggregator/src/main.ts"]
+
+  earnings:
+    <<: *node
+    command: ["node", "services/earnings/src/main.ts"]
+
+  classifier:
+    <<: *node
+    command: ["node", "services/classifier/src/main.ts"]
+    environment:
+      <<: *nodeenv
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+
+volumes:
+  broker-data:
+  pg-data:

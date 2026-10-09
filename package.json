@@ -1,0 +1,19 @@
+{
+  "name": "andx-pipeline",
+  "private": true,
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test \"tests/*.test.ts\""
+  },
+  "dependencies": {
+    "ioredis": "^5.11.1",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/pg": "^8.23.1",
+    "typescript": "^7.0.2"
+  }
+}
