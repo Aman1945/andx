@@ -129,7 +129,9 @@ async function flush() {
     nextCreators.set(campaign, rows);
   }
 
-  const dirtyClipRows = [...dirtyClips].map((id) => [id, clips.get(id)!] as const);
+  // Sorted by key so each upsert walks the primary key in order (fewer page visits).
+  const dirtyClipRows = [...dirtyClips].sort((a, b) => a - b).map((id) => [id, clips.get(id)!] as const);
+  creatorUpserts.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
   const client = await pool.connect();
   try {
     await client.query('BEGIN');

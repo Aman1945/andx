@@ -7,7 +7,7 @@ DATA=${DATA:-./data-small}
 EXPECTED=${EXPECTED:-web2-kit/expected/small-seed7.json}
 SEED=${SEED:-7}
 
-[ -f "$DATA/events.ndjson" ] || node $GEN gen --preset small --seed "$SEED" --out "$DATA"
+[ -f "$DATA/manifest.json" ] || node $GEN gen --preset small --seed "$SEED" --out "$DATA"
 
 wait_idle() {
   # Waits until the broker streams are drained and the stats stop changing.

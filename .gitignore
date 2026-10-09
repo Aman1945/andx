@@ -10,3 +10,4 @@ data-full/
 expected-medium.json
 full-run.log
 ref-*.err
+*.log

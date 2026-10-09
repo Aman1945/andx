@@ -170,8 +170,10 @@ function decodeCursor(s: string): { g: number; c: number } {
 
 // V(clip, t) is the newest accepted snapshot strictly before t: one backward index-only probe
 // on the (clip_id, observed_ms) primary key per clip and bound. Keyset pagination on (gained, clip_id).
+// MATERIALIZED: views_gained is computed once per clip. Inlined, the WHERE and the select list
+// would each run both V(clip, t) probes (seen in EXPLAIN: four subplans instead of two).
 export const TOP_CLIPS_SQL = `
-WITH gained AS (
+WITH gained AS MATERIALIZED (
   SELECT c.clip_id, c.creator_id,
          COALESCE((SELECT s.views FROM agg.snapshots s WHERE s.clip_id = c.clip_id AND s.observed_ms < $3
                    ORDER BY s.observed_ms DESC LIMIT 1), 0)

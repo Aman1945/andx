@@ -34,10 +34,11 @@ services:
       POSTGRES_PASSWORD: andx
       POSTGRES_DB: andx
     command: >
-      postgres -c shared_buffers=1GB -c effective_cache_size=3GB -c work_mem=32MB
+      postgres -c shared_buffers=2GB -c effective_cache_size=3GB -c work_mem=32MB
       -c maintenance_work_mem=256MB -c max_wal_size=8GB -c checkpoint_timeout=15min
       -c wal_buffers=64MB -c wal_compression=lz4 -c max_connections=100
-      -c random_page_cost=1.1 -c autovacuum_vacuum_scale_factor=0.05
+      -c random_page_cost=1.1 -c jit=off -c autovacuum_vacuum_scale_factor=0.05
+      -c bgwriter_delay=50ms -c bgwriter_lru_maxpages=1000
     shm_size: 1g
     mem_limit: 4g
     volumes: [pg-data:/var/lib/postgresql/data]

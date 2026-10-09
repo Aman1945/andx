@@ -24,7 +24,7 @@ CREATE SCHEMA IF NOT EXISTS agg;
 CREATE TABLE IF NOT EXISTS agg.seen_events (
   event_id bigint PRIMARY KEY,
   outcome  "char" NOT NULL
-);
+) WITH (autovacuum_enabled = false); -- insert-only: routine vacuum only re-reads it (wraparound vacuum still runs)
 
 -- Accepted snapshots. Hash partitioned by clip so each partition's index stays cache friendly.
 -- The primary key carries views (INCLUDE) so V(clip, t) is an index-only backward scan.
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS agg.clip_state (
   clip_id   int PRIMARY KEY,
   v_end_obs bigint NOT NULL,
   v_end     bigint NOT NULL
-);
+) WITH (fillfactor = 70); -- free space per page so updates stay HOT (no index write)
 
 -- Dead letter queue. identity is the event_id (or line hash for garbage), unique per reason.
 CREATE TABLE IF NOT EXISTS agg.dlq (
@@ -90,8 +90,7 @@ CREATE TABLE IF NOT EXISTS earn.clip_values (
   creator_id  int    NOT NULL,
   v_end       bigint NOT NULL,
   rev         bigint NOT NULL
-);
-CREATE INDEX IF NOT EXISTS clip_values_by_campaign ON earn.clip_values (campaign_id);
+) WITH (fillfactor = 70);
 
 -- Outputs served by api.
 CREATE TABLE IF NOT EXISTS earn.campaign_spend (
@@ -109,7 +108,7 @@ CREATE TABLE IF NOT EXISTS earn.creator_campaign (
   clips        int    NOT NULL,
   earned_cents bigint NOT NULL,
   PRIMARY KEY (creator_id, campaign_id)
-);
+) WITH (fillfactor = 70);
 `;
 
 export const CLS_SCHEMA = `

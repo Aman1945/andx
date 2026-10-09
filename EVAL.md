@@ -9,7 +9,7 @@ Why: R1/R2 and "brand named at all" are crisp and cheap to get exactly right wit
 | Configuration | Precision | Recall | F1 | How measured |
 |---|---|---|---|---|
 | Rules only (`rules-v1`) | 0.913 | 1.000 | 0.955 | In-sample: the patterns were written after reading all 44 rows, so this overstates real performance |
-| Rules + LLM | __LLM_P__ | __LLM_R__ | __LLM_F1__ | __LLM_HOW__ |
+| Rules + LLM | not measured | not measured | not measured | No model key was configured when this was written. To measure: export `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, then `make eval` |
 
 I did not hold out part of the dev set because 44 rows split three ways (one per brief) leaves too few per brief to learn patterns from; instead I report the rule layer as in-sample and discount it below.
 
@@ -20,6 +20,6 @@ I did not hold out part of the dev set because 44 rows split three ways (one per
 2. `c_8000034`, *"What I eat in a day as a student"*: false positive. Fuel Bar is one item in a list of four meals; the heuristic has no notion of list structure in a short clip.
 3. Expected on the hidden set: sarcasm such as "best wallet ever, lost my funds twice" passes the negative-sentiment cues, because the cues are lexical.
 
-**Cost and latency.** Rules only: no API cost, p95 well under 1 ms per clip. With the LLM: one call per clip that passes the guards (about two thirds of clips on dev), ~400 input and ~15 output tokens: __COST__ per 1,000 clips at the configured model's list price, p95 __LLM_P95__. Calls time out at 1.8 s and fall back to the heuristic, so p95 stays under 2 s.
+**Cost and latency.** Rules only: no API cost, p95 well under 1 ms per clip. With the LLM: one call per clip that passes the guards (about two thirds of clips on dev), ~400 input and ~15 output tokens, so roughly 270k input and 10k output tokens per 1,000 clips (an estimate from the prompt size, not a measurement). That stays under $0.50 per 1,000 for any model priced below about $1.50 per million input tokens. p95 with a model: not measured. Calls time out at 1.8 s and fall back to the heuristic, so p95 stays under 2 s.
 
-**Predicted F1 on the hidden set.** __PREDICTED__
+**Predicted F1 on the hidden set.** Rules only: about 0.80 to 0.88. The 0.955 above is in-sample (the patterns were written after reading all 44 dev rows), so the hidden set will expose brand misspellings, violation phrasings and sarcasm the rules have not seen. Recall should stay high because brand detection is broad; precision is where it will drop (hashtag spam, list mentions, sarcasm). With a capable model on the rule-4/rule-5 judgement, I would expect the upper end of that range or slightly above, but I have not measured it.

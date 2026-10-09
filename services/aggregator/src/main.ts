@@ -30,6 +30,9 @@ const cmdReader = new GroupReader(redis, STREAMS.commands, GROUP, CONSUMER);
 const endAtMs = new Map<number, number>();
 const knownClips = new Set<number>();
 let dlqUnknownPending = 0;
+// Campaigns that have (or had) events in the unknown_campaign DLQ. Only accepted events of these
+// campaigns can be waiting there, so only they need the DLQ delete. A superset is always safe.
+const dlqCampaigns = new Set<number>();
 
 async function refreshCatalog(ids: number[]) {
   if (ids.length === 0) return;
@@ -129,8 +132,9 @@ async function applyBatch(client: pg.PoolClient, views: View[], invalid: Invalid
       }
 
       // Events that were waiting in the DLQ and are now accepted leave it.
-      if (dlqUnknownPending > 0) {
-        const d = await client.query(`DELETE FROM agg.dlq WHERE reason = 'unknown_campaign' AND identity = ANY($1::text[])`, [fresh.map((v) => v[0])]);
+      const maybeInDlq = dlqUnknownPending > 0 ? fresh.filter((v) => dlqCampaigns.has(v[2])) : [];
+      if (maybeInDlq.length) {
+        const d = await client.query(`DELETE FROM agg.dlq WHERE reason = 'unknown_campaign' AND identity = ANY($1::text[])`, [maybeInDlq.map((v) => v[0])]);
         fx.unknownResolved = d.rowCount ?? 0;
       }
 
@@ -165,6 +169,7 @@ async function applyBatch(client: pg.PoolClient, views: View[], invalid: Invalid
   // unknown_campaign -> DLQ, waiting for the campaign to be registered and a replay.
   const unkU = dedupe(unk, (v) => v[0]);
   if (unkU.length) {
+    for (const v of unkU) dlqCampaigns.add(v[2]);
     const r = await client.query(
       `INSERT INTO agg.dlq (reason, identity, payload)
        SELECT 'unknown_campaign', i, p FROM unnest($1::text[], $2::text[]) AS t(i, p)
@@ -260,6 +265,8 @@ async function main() {
   for (const row of all.rows) endAtMs.set(row.campaign_id, row.end_ms);
   const s = await pool.query<{ n: number }>(`SELECT dlq_unknown_campaign AS n FROM agg.stats WHERE id = 1`);
   dlqUnknownPending = s.rows[0]?.n ?? 0;
+  const dc = await pool.query<{ c: number }>(`SELECT DISTINCT (payload::jsonb->>2)::int AS c FROM agg.dlq WHERE reason = 'unknown_campaign'`);
+  for (const row of dc.rows) dlqCampaigns.add(row.c);
   await retryUntil('broker', SVC, async () => {
     await ensureGroup(redis, STREAMS.views, GROUP);
     await ensureGroup(redis, STREAMS.commands, GROUP);

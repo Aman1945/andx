@@ -1,0 +1,99 @@
+PREPARE
+                                                                                    QUERY PLAN                                                                                     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=84422.21..84422.34 rows=51 width=16) (actual time=54.986..54.992 rows=51 loops=1)
+   Buffers: shared hit=61965
+   CTE gained
+     ->  Index Only Scan using clips_by_campaign on clips c  (cost=0.42..84120.76 rows=8966 width=16) (actual time=0.260..52.790 rows=9540 loops=1)
+           Index Cond: (campaign_id = 6)
+           Heap Fetches: 1470
+           Buffers: shared hit=61962
+           SubPlan 1
+             ->  Limit  (cost=3.56..3.73 rows=1 width=16) (actual time=0.004..0.004 rows=1 loops=9540)
+                   Buffers: shared hit=30531
+                   ->  Merge Append  (cost=3.56..35.12 rows=184 width=16) (actual time=0.004..0.004 rows=1 loops=9540)
+                         Sort Key: s.observed_ms DESC
+                         Buffers: shared hit=30531
+                         ->  Index Only Scan Backward using snapshots_p0_pkey on snapshots_p0 s_1  (cost=0.43..5.29 rows=23 width=16) (actual time=0.004..0.004 rows=1 loops=1182)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1768176000000'::bigint))
+                               Heap Fetches: 584
+                               Buffers: shared hit=4131
+                         ->  Index Only Scan Backward using snapshots_p1_pkey on snapshots_p1 s_2  (cost=0.43..5.29 rows=23 width=16) (actual time=0.004..0.004 rows=1 loops=1181)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1768176000000'::bigint))
+                               Heap Fetches: 575
+                               Buffers: shared hit=4119
+                         ->  Index Only Scan Backward using snapshots_p2_pkey on snapshots_p2 s_3  (cost=0.43..1.97 rows=22 width=16) (actual time=0.004..0.004 rows=1 loops=1189)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1768176000000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3568
+                         ->  Index Only Scan Backward using snapshots_p3_pkey on snapshots_p3 s_4  (cost=0.43..3.09 rows=23 width=16) (actual time=0.004..0.004 rows=1 loops=1137)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1768176000000'::bigint))
+                               Heap Fetches: 1
+                               Buffers: shared hit=3413
+                         ->  Index Only Scan Backward using snapshots_p4_pkey on snapshots_p4 s_5  (cost=0.43..1.99 rows=23 width=16) (actual time=0.004..0.004 rows=1 loops=1170)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1768176000000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3511
+                         ->  Index Only Scan Backward using snapshots_p5_pkey on snapshots_p5 s_6  (cost=0.43..3.09 rows=23 width=16) (actual time=0.003..0.003 rows=1 loops=1211)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1768176000000'::bigint))
+                               Heap Fetches: 2
+                               Buffers: shared hit=3636
+                         ->  Index Only Scan Backward using snapshots_p6_pkey on snapshots_p6 s_7  (cost=0.43..3.09 rows=23 width=16) (actual time=0.003..0.003 rows=1 loops=1226)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1768176000000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3679
+                         ->  Index Only Scan Backward using snapshots_p7_pkey on snapshots_p7 s_8  (cost=0.43..7.51 rows=24 width=16) (actual time=0.004..0.004 rows=1 loops=1244)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1768176000000'::bigint))
+                               Heap Fetches: 741
+                               Buffers: shared hit=4474
+           SubPlan 2
+             ->  Limit  (cost=3.56..5.53 rows=1 width=16) (actual time=0.001..0.001 rows=0 loops=9540)
+                   Buffers: shared hit=29914
+                   ->  Merge Append  (cost=3.56..19.28 rows=8 width=16) (actual time=0.001..0.001 rows=0 loops=9540)
+                         Sort Key: s_9.observed_ms DESC
+                         Buffers: shared hit=29914
+                         ->  Index Only Scan Backward using snapshots_p0_pkey on snapshots_p0 s_10  (cost=0.43..2.65 rows=1 width=16) (actual time=0.001..0.001 rows=0 loops=1182)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1767571200000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3701
+                         ->  Index Only Scan Backward using snapshots_p1_pkey on snapshots_p1 s_11  (cost=0.43..2.65 rows=1 width=16) (actual time=0.001..0.001 rows=0 loops=1181)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1767571200000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3700
+                         ->  Index Only Scan Backward using snapshots_p2_pkey on snapshots_p2 s_12  (cost=0.43..1.55 rows=1 width=16) (actual time=0.001..0.001 rows=0 loops=1189)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1767571200000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3731
+                         ->  Index Only Scan Backward using snapshots_p3_pkey on snapshots_p3 s_13  (cost=0.43..2.65 rows=1 width=16) (actual time=0.001..0.001 rows=0 loops=1137)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1767571200000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3565
+                         ->  Index Only Scan Backward using snapshots_p4_pkey on snapshots_p4 s_14  (cost=0.43..1.55 rows=1 width=16) (actual time=0.001..0.001 rows=0 loops=1170)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1767571200000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3670
+                         ->  Index Only Scan Backward using snapshots_p5_pkey on snapshots_p5 s_15  (cost=0.43..2.65 rows=1 width=16) (actual time=0.001..0.001 rows=0 loops=1211)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1767571200000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3809
+                         ->  Index Only Scan Backward using snapshots_p6_pkey on snapshots_p6 s_16  (cost=0.43..2.65 rows=1 width=16) (actual time=0.001..0.001 rows=0 loops=1226)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1767571200000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3831
+                         ->  Index Only Scan Backward using snapshots_p7_pkey on snapshots_p7 s_17  (cost=0.43..2.65 rows=1 width=16) (actual time=0.001..0.001 rows=0 loops=1244)
+                               Index Cond: ((clip_id = c.clip_id) AND (observed_ms < '1767571200000'::bigint))
+                               Heap Fetches: 0
+                               Buffers: shared hit=3907
+   ->  Sort  (cost=301.45..308.93 rows=2989 width=16) (actual time=54.986..54.987 rows=51 loops=1)
+         Sort Key: gained.views_gained DESC, gained.clip_id
+         Sort Method: top-N heapsort  Memory: 28kB
+         Buffers: shared hit=61965
+         ->  CTE Scan on gained  (cost=0.00..201.73 rows=2989 width=16) (actual time=0.262..54.542 rows=9540 loops=1)
+               Filter: (views_gained > 0)
+               Buffers: shared hit=61962
+ Planning:
+   Buffers: shared hit=470
+ Planning Time: 2.456 ms
+ Execution Time: 55.505 ms
+(94 rows)
+
