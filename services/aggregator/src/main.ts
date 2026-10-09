@@ -11,7 +11,7 @@ import { AGG_SCHEMA } from '../../../db/schemas.ts';
 const SVC = 'aggregator';
 const GROUP = 'aggregator';
 const CONSUMER = 'aggregator-1';
-const READ_COUNT = Number(process.env.AGG_READ_COUNT ?? 4); // stream entries per transaction
+const READ_COUNT = Number(process.env.AGG_READ_COUNT ?? 8); // stream entries per transaction
 const RELAY_CHUNK = 20_000;
 const REPLAY_CHUNK = 20_000;
 

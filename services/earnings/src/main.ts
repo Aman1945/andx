@@ -12,7 +12,7 @@ const SVC = 'earnings';
 const GROUP = 'earnings';
 const CONSUMER = 'earnings-1';
 const MIN_FLUSH_MS = 500;
-const MAX_FLUSH_MS = 20_000;
+const MAX_FLUSH_MS = 15_000;
 const MAX_DIRTY_CLIPS = 400_000;
 
 type Clip = { campaign: number; creator: number; v: number; rev: number };
@@ -225,13 +225,15 @@ async function main() {
       else log(SVC, 'skipping message with unknown contract', { id: m.id });
       pendingIds.push(m.id);
     }
-    const caughtUp = msgs.length === 0;
+    // Time-based, not "caught up": under load the aggregator publishes one small entry per batch,
+    // so earnings is nearly always caught up, and flushing on every entry rewrote ~27k creator rows
+    // per second. The interval adapts to the cost of a flush: ~500 ms when quiet, up to 15 s under load.
     const due = Date.now() - lastFlush >= flushEvery;
-    if ((pendingIds.length || dirtyCampaigns.size) && (caughtUp || due || dirtyClips.size >= MAX_DIRTY_CLIPS)) {
+    if ((pendingIds.length || dirtyCampaigns.size) && (due || dirtyClips.size >= MAX_DIRTY_CLIPS)) {
       const r = await flush();
       lastFlush = Date.now();
-      // Spend at most ~25% of the time writing while there is a backlog.
-      flushEvery = Math.min(MAX_FLUSH_MS, Math.max(MIN_FLUSH_MS, r.took * 4));
+      // Spend at most ~12% of the time writing while there is a backlog.
+      flushEvery = Math.min(MAX_FLUSH_MS, Math.max(MIN_FLUSH_MS, r.took * 8));
       if (r.took > 1000) log(SVC, 'flush', r);
     }
   }

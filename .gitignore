@@ -7,3 +7,6 @@ data-full/
 *.ndjson.gz
 .env
 .DS_Store
+expected-medium.json
+full-run.log
+ref-*.err

@@ -36,7 +36,7 @@ services:
     command: >
       postgres -c shared_buffers=1GB -c effective_cache_size=3GB -c work_mem=32MB
       -c maintenance_work_mem=256MB -c max_wal_size=8GB -c checkpoint_timeout=15min
-      -c wal_buffers=64MB -c wal_compression=on -c max_connections=100
+      -c wal_buffers=64MB -c wal_compression=lz4 -c max_connections=100
       -c random_page_cost=1.1 -c autovacuum_vacuum_scale_factor=0.05
     shm_size: 1g
     mem_limit: 4g
