@@ -1,0 +1,32 @@
+[
+ {
+  "campaign_id": "k_00007",
+  "brand": "Nimbus Wallet",
+  "product": "Self-custody crypto wallet app for iOS and Android",
+  "on_brief": "The clip's main subject is Nimbus Wallet: setting it up, using its features (swaps, multi-chain balances, backups, hardware key support, security settings), or reviewing it.",
+  "rules": [
+   "R1: No promises of profit or returns and no price predictions. Quoting a yield or APY, saying a token will rise, or saying viewers cannot lose money all count. A referral code or fee discount does not.",
+   "R2: Never show, read out, or ask viewers to share a recovery phrase or private key."
+  ]
+ },
+ {
+  "campaign_id": "k_00042",
+  "brand": "Drift Arena",
+  "product": "Mobile racing game",
+  "on_brief": "The clip's main subject is Drift Arena: gameplay, tips, car builds and tuning, events, updates, or a review.",
+  "rules": [
+   "R1: No real-money betting, wagering, cash matches, or gambling content.",
+   "R2: No cheats, hacks, mod menus, modded APKs, coin generators, or account selling or trading."
+  ]
+ },
+ {
+  "campaign_id": "k_00133",
+  "brand": "Fuel Bar",
+  "product": "High-protein snack bar",
+  "on_brief": "The clip's main subject is Fuel Bar: taste tests, ingredients and macros, when to eat it, or recipes using it.",
+  "rules": [
+   "R1: No medical claims (cures, treats, fixes, controls a condition) and no guaranteed weight-loss or muscle-gain results. Plain factual statements about macros and ingredients are fine.",
+   "R2: Do not disparage a named competitor (calling it bad, fake, a scam, junk, unsafe, poison). Stating a preference or a factual comparison is not disparagement."
+  ]
+ }
+]
