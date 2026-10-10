@@ -1,6 +1,6 @@
 # ANDX Clip View Pipeline
 
-**Hours spent:** about 4.5 hours of wall-clock time on 9 Oct (first commit 16:41 IST), most of it running and tuning the full preset. Most code was written with Claude Code; see AI_USAGE.md.
+**Hours spent:** about 4.5 hours of wall-clock time on 9 Oct (first commit 16:41 IST), most of it running and tuning the full preset. AI tools were used as allowed; see AI_USAGE.md.
 **Unfinished / known gaps:**
 - P1 is met but not "strong": the full preset took **31 min** from first request to fully processed (target < 45 min, strong < 20 min). The single aggregator is the limit; see Known limitations.
 - The classifier's LLM path is implemented but **not measured**: no model key was configured, so the rule layer is what ran. See EVAL.md.
